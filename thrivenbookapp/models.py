@@ -57,3 +57,8 @@ class SavedPost(models.Model):
     user = models.ForeignKey(User, on_delete=models.CASCADE)
     post = models.ForeignKey(BookPost, on_delete=models.CASCADE)
     saved_at = models.DateTimeField(auto_now_add=True)
+
+class PostLike(models.Model):
+    user = models.ForeignKey(User, on_delete=models.CASCADE)
+    post = models.ForeignKey(BookPost, on_delete=models.CASCADE)
+    liked_at = models.DateTimeField(auto_now_add=True)
