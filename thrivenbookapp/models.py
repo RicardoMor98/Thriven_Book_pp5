@@ -35,3 +35,13 @@ class User(AbstractUser):
     profile_picture = models.ImageField(upload_to='profile_pics/', null=True, blank=True)
     is_author = models.BooleanField(default=False)
     skill_level = models.CharField(max_length=20, choices=SKILL_LEVELS, null=True, blank=True)
+
+class BookPost(models.Model):
+    author = models.ForeignKey(User, on_delete=models.CASCADE, related_name='posts')
+    title = models.CharField(max_length=100)
+    genre = models.CharField(max_length=20, choices=GENRES)
+    age_rating = models.CharField(max_length=10, choices=AGE_RATINGS)
+    skill_level = models.CharField(max_length=20, choices=SKILL_LEVELS)
+    image = models.ImageField(upload_to='book_images/', null=True, blank=True)
+    description = models.TextField()
+    created_at = models.DateTimeField(auto_now_add=True)
