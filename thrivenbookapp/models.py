@@ -221,6 +221,22 @@ class SavedPost(models.Model):
         return f"{self.user.username} saved {self.post.title}"
 
 class PostLike(models.Model):
-    user = models.ForeignKey(User, on_delete=models.CASCADE)
-    post = models.ForeignKey(BookPost, on_delete=models.CASCADE)
+    """Model for users to like posts"""
+    user = models.ForeignKey(
+        User, 
+        on_delete=models.CASCADE, 
+        related_name='liked_posts'
+    )
+    post = models.ForeignKey(
+        BookPost, 
+        on_delete=models.CASCADE, 
+        related_name='likes'
+    )
     liked_at = models.DateTimeField(auto_now_add=True)
+    
+    class Meta:
+        unique_together = ['user', 'post']
+        ordering = ['-liked_at']
+    
+    def __str__(self):
+        return f"{self.user.username} liked {self.post.title}"
