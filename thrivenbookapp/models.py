@@ -43,7 +43,6 @@ COMMENT_IMPORTANCE = [
     (4, 'Very High'),
 ]
 
-# Create your models here.
 class User(AbstractUser):
     """Custom User model with additional fields for authors and readers"""
     pronoun = models.CharField(max_length=10, choices=PRONOUNS, default='they')
@@ -99,6 +98,7 @@ class User(AbstractUser):
     def get_comment_count(self):
         """Return the number of comments by this user"""
         return self.comment_set.count()
+
 
 class BookPost(models.Model):
     """Model for book ideas/posts created by authors"""
@@ -199,6 +199,7 @@ class Comment(models.Model):
             self.is_pinned = False
         super().save(*args, **kwargs)
 
+
 class SavedPost(models.Model):
     """Model for users to save posts they're interested in"""
     user = models.ForeignKey(
@@ -220,6 +221,7 @@ class SavedPost(models.Model):
     def __str__(self):
         return f"{self.user.username} saved {self.post.title}"
 
+
 class PostLike(models.Model):
     """Model for users to like posts"""
     user = models.ForeignKey(
@@ -240,6 +242,7 @@ class PostLike(models.Model):
     
     def __str__(self):
         return f"{self.user.username} liked {self.post.title}"
+
 
 class Notification(models.Model):
     """Model for user notifications"""
@@ -263,6 +266,7 @@ class Notification(models.Model):
     
     def __str__(self):
         return f"Notification for {self.user.username}: {self.message}"
+
 
 class UserFollow(models.Model):
     """Model for users to follow each other"""
