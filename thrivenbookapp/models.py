@@ -1,5 +1,8 @@
 from django.db import models
 from django.contrib.auth.models import AbstractUser
+from django.core.validators import MinLengthValidator, MaxLengthValidator
+from django.utils import timezone
+from django.urls import reverse
 
 # Constants
 GENRES = [
@@ -8,6 +11,10 @@ GENRES = [
     ('romance', 'Romance'),
     ('horror', 'Horror'),
     ('sci-fi', 'Science Fiction'),
+    ('fantasy', 'Fantasy'),
+    ('mystery', 'Mystery'),
+    ('thriller', 'Thriller'),
+    ('drama', 'Drama'),
 ]
 
 AGE_RATINGS = [
@@ -23,9 +30,17 @@ SKILL_LEVELS = [
 ]
 
 PRONOUNS = [
-    ('he', 'He'),
-    ('she', 'She'),
+    ('he', 'He/Him'),
+    ('she', 'She/Her'),
+    ('they', 'They/Them'),
     ('other', 'Other'),
+]
+
+COMMENT_IMPORTANCE = [
+    (1, 'Low'),
+    (2, 'Medium'),
+    (3, 'High'),
+    (4, 'Very High'),
 ]
 
 # Create your models here.

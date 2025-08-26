@@ -35,12 +35,13 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 SECRET_KEY = 'osergioestaveromeutrabalholol'
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = False
+DEBUG = True
 
-ALLOWED_HOSTS = ['8000-ricardomor9-thrivenbook-iifzfom1n0p.ws-eu120.gitpod.io',
+ALLOWED_HOSTS = ['8000-ricardomor9-thrivenbook-iifzfom1n0p.ws-eu121.gitpod.io',
                 '.herokuapp.com',
                 '127.0.0.1']
 
+AUTH_USER_MODEL = "thrivenbookapp.User"
 
 # Application definition
 
