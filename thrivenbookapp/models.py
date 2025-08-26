@@ -263,3 +263,30 @@ class Notification(models.Model):
     
     def __str__(self):
         return f"Notification for {self.user.username}: {self.message}"
+
+class UserFollow(models.Model):
+    """Model for users to follow each other"""
+    follower = models.ForeignKey(
+        User, 
+        on_delete=models.CASCADE, 
+        related_name='following'
+    )
+    followed = models.ForeignKey(
+        User, 
+        on_delete=models.CASCADE, 
+        related_name='followers'
+    )
+    created_at = models.DateTimeField(auto_now_add=True)
+    
+    class Meta:
+        unique_together = ['follower', 'followed']
+        ordering = ['-created_at']
+    
+    def __str__(self):
+        return f"{self.follower.username} follows {self.followed.username}"
+    
+    def save(self, *args, **kwargs):
+        """Prevent users from following themselves"""
+        if self.follower == self.followed:
+            raise ValueError("Users cannot follow themselves.")
+        super().save(*args, **kwargs)
