@@ -167,16 +167,58 @@ class BookPost(models.Model):
 
 
 class Comment(models.Model):
+    """Model for comments on book posts"""
     user = models.ForeignKey(User, on_delete=models.CASCADE)
-    post = models.ForeignKey(BookPost, on_delete=models.CASCADE, related_name='comments')
-    text = models.TextField()
+    post = models.ForeignKey(
+        BookPost, 
+        on_delete=models.CASCADE, 
+        related_name='comments'
+    )
+    text = models.TextField(
+        validators=[MinLengthValidator(10), MaxLengthValidator(1000)]
+    )
     is_pinned = models.BooleanField(default=False)
+    importance_level = models.IntegerField(
+        choices=COMMENT_IMPORTANCE, 
+        default=2,
+        help_text="How important is this comment for the author?"
+    )
     created_at = models.DateTimeField(auto_now_add=True)
+    updated_at = models.DateTimeField(auto_now=True)
+    
+    class Meta:
+        ordering = ['-is_pinned', '-importance_level', 'created_at']
+    
+    def __str__(self):
+        return f"Comment by {self.user.username} on {self.post.title}"
+    
+    def save(self, *args, **kwargs):
+        """Override save to ensure only authors can pin comments"""
+        if self.is_pinned and not self.post.author == self.user:
+            # Only the post author can pin comments
+            self.is_pinned = False
+        super().save(*args, **kwargs)
 
 class SavedPost(models.Model):
-    user = models.ForeignKey(User, on_delete=models.CASCADE)
-    post = models.ForeignKey(BookPost, on_delete=models.CASCADE)
+    """Model for users to save posts they're interested in"""
+    user = models.ForeignKey(
+        User, 
+        on_delete=models.CASCADE, 
+        related_name='saved_posts'
+    )
+    post = models.ForeignKey(
+        BookPost, 
+        on_delete=models.CASCADE, 
+        related_name='saved_by'
+    )
     saved_at = models.DateTimeField(auto_now_add=True)
+    
+    class Meta:
+        unique_together = ['user', 'post']
+        ordering = ['-saved_at']
+    
+    def __str__(self):
+        return f"{self.user.username} saved {self.post.title}"
 
 class PostLike(models.Model):
     user = models.ForeignKey(User, on_delete=models.CASCADE)
