@@ -101,14 +101,70 @@ class User(AbstractUser):
         return self.comment_set.count()
 
 class BookPost(models.Model):
-    author = models.ForeignKey(User, on_delete=models.CASCADE, related_name='posts')
-    title = models.CharField(max_length=100)
+    """Model for book ideas/posts created by authors"""
+    author = models.ForeignKey(
+        User, 
+        on_delete=models.CASCADE, 
+        related_name='posts',
+        limit_choices_to={'is_author': True}
+    )
+    title = models.CharField(
+        max_length=100,
+        validators=[MinLengthValidator(5)]
+    )
     genre = models.CharField(max_length=20, choices=GENRES)
     age_rating = models.CharField(max_length=10, choices=AGE_RATINGS)
     skill_level = models.CharField(max_length=20, choices=SKILL_LEVELS)
-    image = models.ImageField(upload_to='book_images/', null=True, blank=True)
-    description = models.TextField()
+    image = models.ImageField(
+        upload_to='book_images/', 
+        null=True, 
+        blank=True,
+        default='book_images/default_book.jpg'
+    )
+    description = models.TextField(
+        validators=[MinLengthValidator(50), MaxLengthValidator(2000)]
+    )
+    is_active = models.BooleanField(
+        default=True,
+        help_text="Designates whether this post is active and visible to users."
+    )
+    comment_section_closed = models.BooleanField(
+        default=False,
+        help_text="If checked, users cannot add new comments to this post."
+    )
     created_at = models.DateTimeField(auto_now_add=True)
+    updated_at = models.DateTimeField(auto_now=True)
+    
+    class Meta:
+        ordering = ['-created_at']
+        indexes = [
+            models.Index(fields=['created_at']),
+            models.Index(fields=['genre']),
+            models.Index(fields=['age_rating']),
+        ]
+    
+    def __str__(self):
+        return f"{self.title} by {self.author.username}"
+    
+    def get_absolute_url(self):
+        return reverse('post_detail', kwargs={'pk': self.pk})
+    
+    def get_like_count(self):
+        """Return the number of likes for this post"""
+        return self.likes.count()
+    
+    def get_comment_count(self):
+        """Return the number of comments for this post"""
+        return self.comments.count()
+    
+    def get_pinned_comments(self):
+        """Return pinned comments for this post"""
+        return self.comments.filter(is_pinned=True).order_by('-importance_level', 'created_at')
+    
+    def can_user_comment(self, user):
+        """Check if a user can comment on this post"""
+        return self.is_active and not self.comment_section_closed and user.is_authenticated
+
 
 class Comment(models.Model):
     user = models.ForeignKey(User, on_delete=models.CASCADE)
